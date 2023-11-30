@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Update Product</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+
+<body>
+    <div sec:authorize="hasRole('ROLE_ADMIN')">
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <p class="navbar-text">UPDATE PRODUCT FOR ADMIN</p>
+                    <a th:href="@{/home}" class="navbar-brand">go to home</a>
+                </div>
+                <ul class="nav navbar-nav"></ul>
+                <form class="navbar-form navbar-right" action="#" th:action="@{/logout}" method="post">
+                    <button type="submit" class="btn btn-default">Logout</button>
+                </form>
+            </div>
+        </nav>
+
+        <br>
+        <br>
+        <div class="container">
+            <h2>UPDATE product admin page</h2>
+        </div>
+
+        <div class="container">
+            <hr>
+            <p class="h4 mb-4">Update product</p>
+
+            <form action="#" th:action="@{/products/update/save}" th:object="${product}" method="POST" enctype="multipart/form-data">
+
+                <input type="hidden" th:field="*{id}" />
+                <label>Product Name:</label>
+                <input type="text" th:field="*{name}" class="form-control mb-4 w-25" placeholder="Product Name">
+                <label>Description:</label>
+                <input type="text" th:field="*{description}" class="form-control mb-4 w-25" placeholder="Description">
+                <label>Price:</label>
+                <input type="number" th:field="*{price}" class="form-control mb-4 w-25" placeholder="Price">
+
+                <!-- Display the current image if it exists -->
+                <div th:if="${product.imageUrl}">
+                    <img th:src="@{${product.imageUrl}}" style="max-width: 300px; max-height: 300px;" />
+                </div>
+
+                <button type="submit" class="btn btn-info col-2" onclick="saveSuccessNotif()">Update</button>
+            </form>
+            <hr>
+        </div>
+
+        <script th:inline="javascript">
+            function saveSuccessNotif() {
+                alert('Product updated successfully!');
+            }
+        </script>
+    </div>
+</body>
+
+</html>
