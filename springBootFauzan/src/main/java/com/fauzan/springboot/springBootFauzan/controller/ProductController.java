@@ -1,11 +1,16 @@
 package com.fauzan.springboot.springBootFauzan.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.fauzan.springboot.springBootFauzan.model.Product;
@@ -16,39 +21,44 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
-@Controller
+
+@RestController
+@RequestMapping("/api/controllproduct/")
 public class ProductController {
     private final ProductService productService;
-    private final String uploadDir = "D:/coding/springBootFauzan (1)coba simpan di file ver lama/springBootFauzan (1)coba simpan di file/springBootFauzan/src/main/resources/static/images/";
+    private final String uploadDir 
+    = "D:/coding/springBootFauzan (1)coba simpan di file ver lama/springBootFauzan (1)coba simpan di file/springBootFauzan/src/main/resources/static/images/";
 
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
 
-    @GetMapping("/addProduct")
-    public String showAddProductForm(Model model) {
-        model.addAttribute("product", new Product());
-        return "addProduct";
-    }
+    // not needed
 
-    @PostMapping("/products/save")
-    public String saveProduct(@ModelAttribute("product") Product product, @RequestParam("image") MultipartFile image,
-                              RedirectAttributes redirectAttributes, Model model) {
-        if (!image.isEmpty()) {
-            try {
+    // @GetMapping("/addProduct")
+    // public String showAddProductForm(Model model) {
+    //     model.addAttribute("product", new Product());
+    //     return "addProduct";
+    // }
+
+     @PostMapping("/save")
+    public ResponseEntity<String> saveProduct(@RequestBody Product product, @RequestParam("image") MultipartFile image) {
+        try {
+            if (!image.isEmpty()) {
                 String originalFileName = image.getOriginalFilename();
                 String fileName = UUID.randomUUID() + originalFileName;
                 Path path = Paths.get(uploadDir + fileName);
                 Files.write(path, image.getBytes());
                 product.setImageUrl("/images/" + fileName);
-            } catch (IOException e) {
-                e.printStackTrace();
-                // Handle the exception appropriately
             }
+
+            productService.save(product);
+            return ResponseEntity.ok("Product saved successfully");
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Handle the exception appropriately
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving the product");
         }
-        productService.save(product);
-        model.addAttribute("success", true);
-        return "redirect:/home";
     }
 
     @PostMapping("/products/update")
